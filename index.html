@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CXrSED — Play. Create. Remember.</title>
+<style>
+:root{--blue:#00a2ff;--ink:#191b1f;--muted:#60656d;--line:#e5e7eb;--bg:#f4f5f6}
+*{box-sizing:border-box}body{margin:0;font:15px/1.45 Arial,Helvetica,sans-serif;color:var(--ink);background:var(--bg)}
+button,input{font:inherit}button{cursor:pointer;border:0;border-radius:8px;padding:11px 16px;font-weight:700}
+.top{height:62px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:22px;padding:0 max(18px,calc((100% - 1180px)/2));position:sticky;top:0;z-index:5}
+.logo{font-size:23px;font-weight:900;letter-spacing:-1.5px;color:#15171a;white-space:nowrap}.logo b{color:var(--blue)}
+nav{display:flex;gap:20px;flex:1}nav button{background:none;padding:8px;color:#333;font-weight:600}nav button:hover{color:var(--blue)}
+.search{max-width:250px;width:22vw;padding:10px 13px;border:1px solid #ddd;border-radius:8px;background:#f8f8f8}
+.balance{background:#e9f6ff;color:#087ac0;padding:9px 12px;border-radius:8px;font-weight:800;white-space:nowrap}
+.account button{background:var(--blue);color:white}.account .ghost{background:#f0f1f2;color:#222;margin-right:6px}
+main{max-width:1180px;margin:25px auto;padding:0 18px}.hero{background:linear-gradient(115deg,#111827,#174c70 65%,#00a2ff);color:white;border-radius:15px;padding:35px;display:flex;align-items:center;justify-content:space-between;min-height:220px;overflow:hidden}
+.hero h1{font-size:36px;line-height:1.1;margin:0 0 12px}.hero p{max-width:510px;color:#dceeff}.hero button{background:white;color:#087fc4}.hero-art{font-size:105px;filter:drop-shadow(0 12px 15px #001a)}.section-head{display:flex;align-items:center;justify-content:space-between;margin:28px 0 14px}.section-head h2{margin:0;font-size:22px}.muted{color:var(--muted);font-size:13px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}.tabs button{background:#fff;border:1px solid var(--line);color:#333}.tabs button.active{background:#202328;color:#fff;border-color:#202328}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.tile{background:white;border:1px solid var(--line);border-radius:12px;overflow:hidden;transition:.15s}.tile:hover{transform:translateY(-2px);box-shadow:0 8px 24px #00000010}.thumb{height:135px;display:grid;place-items:center;font-size:57px;background:linear-gradient(135deg,#dcefff,#f3f8ff)}.tile-body{padding:13px}.tile h3{font-size:15px;margin:0 0 5px}.price{font-weight:800;color:#16864b}.tile button{width:100%;margin-top:11px;background:#202328;color:white}.tile button:disabled{background:#d8dade;color:#666;cursor:default}
+.panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px}.profile{display:flex;align-items:center;gap:15px}.avatar{width:66px;height:66px;border-radius:12px;background:#e3f3ff;display:grid;place-items:center;font-size:38px}.empty{padding:38px;text-align:center;color:var(--muted);background:#fff;border:1px dashed #cbd0d6;border-radius:12px}
+footer{max-width:1180px;margin:35px auto;padding:20px 18px;color:#747982;border-top:1px solid var(--line);font-size:12px}
+.modal{position:fixed;inset:0;background:#0008;display:none;place-items:center;z-index:10;padding:16px}.modal.open{display:grid}.dialog{width:min(420px,100%);background:white;border-radius:14px;padding:24px;box-shadow:0 20px 70px #0005}.dialog h2{margin:0 0 7px}.dialog input{width:100%;padding:12px;border:1px solid #d5d8dc;border-radius:8px;margin:7px 0 12px}.dialog .primary{width:100%;background:var(--blue);color:white;margin-top:5px}.dialog .close{float:right;background:#f0f1f2;padding:6px 10px}.notice{font-size:12px;color:#737982;margin-top:12px}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#202328;color:white;padding:12px 18px;border-radius:9px;display:none;z-index:20}
+@media(max-width:850px){nav{gap:4px}nav button{font-size:13px;padding:7px}.grid{grid-template-columns:repeat(3,1fr)}.hero-art{font-size:75px}}
+@media(max-width:620px){.top{gap:9px;flex-wrap:wrap;height:auto;padding:10px 14px}.logo{font-size:20px}nav{order:3;flex-basis:100%;justify-content:space-between}.search{display:none}.balance{margin-left:auto;font-size:12px}.account button{padding:8px}.grid{grid-template-columns:repeat(2,1fr)}.hero{padding:24px}.hero h1{font-size:29px}.hero-art{font-size:54px}}
+</style>
+</head>
+<body>
+<header class="top">
+ <div class="logo">CXr<b>SED</b></div>
+ <nav><button onclick="showPage('discover')">Discover</button><button onclick="showPage('catalog')">Catalog</button><button onclick="showPage('avatar')">Avatar</button><button onclick="showPage('profile')">Profile</button></nav>
+ <input class="search" id="search" placeholder="Search catalog" oninput="render()">
+ <div class="balance" id="balance">◆ 999,999,999</div>
+ <div class="account" id="account"><button class="ghost" onclick="openAuth('login')">Log In</button><button onclick="openAuth('signup')">Sign Up</button></div>
+</header>
+<main id="app"></main>
+<footer>CXrSED is an independent fan-made revival concept and is not affiliated with, endorsed by, or operated by Roblox Corporation. CXrSED credits are fictional demo currency and have no cash or Roblox value. Never use your Roblox password here.</footer>
+<div class="modal" id="modal"><div class="dialog"><button class="close" onclick="closeAuth()">✕</button><h2 id="authTitle">Create your account</h2><p class="muted" id="authSub">Join CXrSED and start customizing.</p><form id="authForm" novalidate><label>Username</label><input id="username" minlength="3" maxlength="20" required autocomplete="username"><div id="emailWrap"><label>Email (optional)</label><input id="email" type="email" autocomplete="email"></div><label>Password</label><input id="password" type="password" minlength="6" required autocomplete="new-password"><button class="primary" id="authSubmit" type="submit">Create account</button><p id="authError" role="alert" style="color:#c62828;font-size:13px;margin:8px 0 0;display:none"></p></form><p class="muted" style="text-align:center" id="switchAuth">Already have an account? <a href="#" onclick="openAuth('login');return false">Log in</a></p><p class="notice">Demo account data is stored only in this browser on this device. This prototype does not provide production-grade account security or a server.</p></div></div>
+<div class="toast" id="toast"></div>
+<script>
+const START=999999999;
+const items=[
+ {id:1,name:"Classic Crown",price:250,icon:"👑",type:"Accessories",desc:"A timeless royal look."},
+ {id:2,name:"Blue Shaggy Hair",price:95,icon:"💙",type:"Hair",desc:"Messy, classic style."},
+ {id:3,name:"Darkest Hood",price:150,icon:"🥷",type:"Accessories",desc:"Keep it mysterious."},
+ {id:4,name:"Pixel Shades",price:75,icon:"🕶️",type:"Accessories",desc:"Retro pixel eyewear."},
+ {id:5,name:"Classic Red Cap",price:50,icon:"🧢",type:"Hats",desc:"A simple everyday cap."},
+ {id:6,name:"Golden Wings",price:500,icon:"🪽",type:"Accessories",desc:"Stand out from the crowd."},
+ {id:7,name:"Retro Spiky Hair",price:80,icon:"💈",type:"Hair",desc:"A throwback favorite."},
+ {id:8,name:"Emerald Headphones",price:125,icon:"🎧",type:"Accessories",desc:"Turn up the style."}
+];
+const memoryStore={};
+let page="discover",filter="All",user=getStored("cxrsed_current")||null;
+function getStored(k){try{return localStorage.getItem(k)}catch(e){return memoryStore[k]??null}}
+function setStored(k,v){try{localStorage.setItem(k,v)}catch(e){memoryStore[k]=String(v)}}
+function removeStored(k){try{localStorage.removeItem(k)}catch(e){delete memoryStore[k]}}
+function db(){try{return JSON.parse(getStored("cxrsed_users")||"{}")}catch(e){return {}}}
+function saveDB(x){setStored("cxrsed_users",JSON.stringify(x))}
+function current(){return user?db()[user]:null}
+function money(n){return n.toLocaleString("en-US")}
+function toast(s){let t=document.getElementById("toast");t.textContent=s;t.style.display="block";setTimeout(()=>t.style.display="none",2200)}
+function showPage(p){page=p;render();window.scrollTo(0,0)}
+function render(){
+ const u=current();document.getElementById("balance").textContent="◆ "+money(u?u.credits:START);
+ document.getElementById("account").innerHTML=u?`<button class="ghost" onclick="showPage('profile')">${escapeHTML(u.name)}</button><button onclick="logout()">Log Out</button>`:`<button class="ghost" onclick="openAuth('login')">Log In</button><button onclick="openAuth('signup')">Sign Up</button>`;
+ const app=document.getElementById("app");
+ if(page==="discover"){app.innerHTML=`<section class="hero"><div><h1>Your next era starts here.</h1><p>Discover classic-inspired experiences, build your look, and make your mark in the CXrSED community.</p><button onclick="showPage('catalog')">Explore the Catalog</button></div><div class="hero-art">🧱</div></section><div class="section-head"><h2>Featured experiences</h2><span class="muted">A little nostalgia, a lot of fun</span></div><div class="grid">${[['🏙️','Brookhaven RP','Roleplay your story'],['🏁','Speed Run','Race to the finish'],['🏡','Welcome Home','Build your dream place'],['⚔️','Arena Clash','Challenge your friends']].map(x=>`<article class="tile"><div class="thumb">${x[0]}</div><div class="tile-body"><h3>${x[1]}</h3><span class="muted">${x[2]}</span><button onclick="toast('Experience demo coming soon!')">Play</button></div></article>`).join("")}</div><div class="section-head"><h2>Popular catalog picks</h2><button onclick="showPage('catalog')">View all</button></div>${cards(items.slice(0,4))}`}
+ else if(page==="catalog"){let q=document.getElementById("search").value.toLowerCase();let list=items.filter(x=>(filter==="All"||x.type===filter)&&(x.name.toLowerCase().includes(q)));app.innerHTML=`<div class="section-head"><div><h2>Catalog</h2><span class="muted">Find your next look.</span></div></div><div class="tabs">${["All","Accessories","Hair","Hats"].map(x=>`<button class="${filter===x?'active':''}" onclick="filter='${x}';render()">${x}</button>`).join("")}</div><div style="height:14px"></div>${cards(list)}`}
+ else if(page==="avatar"){app.innerHTML=`<div class="section-head"><h2>Avatar Editor</h2></div><div class="panel profile"><div class="avatar">🧍</div><div><h3>${u?escapeHTML(u.name):"Guest Avatar"}</h3><p class="muted">Your classic-inspired character.</p><button onclick="showPage('catalog')">Browse items</button></div></div><div class="section-head"><h2>Owned items</h2></div>${u&&u.inventory.length?cards(items.filter(x=>u.inventory.includes(x.id)),true):`<div class="empty">No items yet. Visit the catalog to pick up your first item.</div>`}`}
+ else if(page==="profile"){app.innerHTML=u?`<div class="section-head"><h2>Profile</h2></div><div class="panel profile"><div class="avatar">🙂</div><div><h2>${escapeHTML(u.name)}</h2><span class="muted">CXrSED member</span><p class="price">◆ ${money(u.credits)} credits</p></div></div><div class="section-head"><h2>Inventory (${u.inventory.length})</h2></div>${u.inventory.length?cards(items.filter(x=>u.inventory.includes(x.id)),true):`<div class="empty">Your inventory is empty.</div>`}`:`<div class="empty"><h2>Join CXrSED</h2><p>Log in or create an account to view your profile.</p><button onclick="openAuth('signup')">Sign Up</button></div>`}
+}
+function cards(list,owned=false){return list.length?`<div class="grid">${list.map(x=>`<article class="tile"><div class="thumb">${x.icon}</div><div class="tile-body"><h3>${x.name}</h3><div class="muted">${x.desc}</div><p class="price">◆ ${money(x.price)}</p><button ${owned?'disabled':''} onclick="buy(${x.id})">${owned?'Owned':'Buy item'}</button></div></article>`).join("")}</div>`:`<div class="empty">No items match your search.</div>`}
+function buy(id){let u=current();if(!u){openAuth('signup');return}let item=items.find(x=>x.id===id);if(u.inventory.includes(id)){toast("You already own this item.");return}if(u.credits<item.price){toast("Not enough credits.");return}u.credits-=item.price;u.inventory.push(id);let d=db();d[user]=u;saveDB(d);toast(item.name+" added to inventory!");render()}
+function openAuth(mode){
+ document.getElementById("modal").classList.add("open");
+ document.getElementById("authTitle").textContent=mode==="signup"?"Create your account":"Welcome back";
+ document.getElementById("authSub").textContent=mode==="signup"?"Join CXrSED and start customizing.":"Log in to your CXrSED account.";
+ document.getElementById("emailWrap").style.display=mode==="signup"?"block":"none";
+ document.getElementById("authSubmit").textContent=mode==="signup"?"Create account":"Log in";
+ document.getElementById("switchAuth").innerHTML=mode==="signup"
+  ? `Already have an account? <a href="#" onclick="openAuth('login');return false">Log in</a>`
+  : `New here? <a href="#" onclick="openAuth('signup');return false">Create account</a>`;
+ document.getElementById("authForm").dataset.mode=mode;
+ document.getElementById("password").value="";
+ document.getElementById("authError").style.display="none";
+ document.getElementById("authError").textContent="";
+}
+function closeAuth(){document.getElementById("modal").classList.remove("open")}
+document.getElementById("authForm").addEventListener("submit",e=>{
+ e.preventDefault();
+ const err=document.getElementById("authError");
+ const showError=msg=>{err.textContent=msg;err.style.display="block"};
+ try{
+  const mode=e.target.dataset.mode;
+  const name=document.getElementById("username").value.trim();
+  const pass=document.getElementById("password").value;
+  const d=db();
+  if(name.length<3||name.length>20){showError("Username must be 3–20 characters.");return}
+  if(pass.length<6){showError("Password must be at least 6 characters.");return}
+  if(mode==="signup"){
+   if(d[name.toLowerCase()]){showError("That username is already taken. Try another.");return}
+   d[name.toLowerCase()]={name,pass,credits:START,inventory:[],email:document.getElementById("email").value};
+   saveDB(d);user=name.toLowerCase();setStored("cxrsed_current",user);toast("Welcome to CXrSED!");
+  }else{
+   const key=name.toLowerCase();
+   if(!d[key]||d[key].pass!==pass){showError("Incorrect username or password.");return}
+   user=key;setStored("cxrsed_current",user);toast("Logged in successfully.");
+  }
+  closeAuth();render();
+ }catch(err){showError("Couldn't save your account in this browser. Open this page directly in Chrome and try again.")}
+});
+function logout(){user=null;removeStored("cxrsed_current");toast("Logged out.");render()}
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+render();
+</script>
+</body></html>
